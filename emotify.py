@@ -4,12 +4,14 @@ import struct
 import keras
 import numpy as np
 import array
+import os
 
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation, TimeDistributedDense, Masking
 from keras.layers.recurrent import LSTM
 from keras.layers.normalization import BatchNormalization
 from keras.layers.advanced_activations import LeakyReLU
+from keras.models import model_from_json
 
 print 'loading data'
 
@@ -48,24 +50,43 @@ for i in range(len(X)):
 y = np.array(y)
 X = np.array(X)
 
-X = X[:, :200, :]
+X = X[:, :220 * 5 * 2, :]
 
-model = Sequential()
+# try load model
+if os.path.isfile('model.json') and os.path.isfile('model.h5') and False:
+	model = model_from_json(open('model.json').read())
+	model.load_weights('model.h5')
+else:
+	model = Sequential()
 
-# model.add(BatchNormalization(mode=0))
-model.add(Masking(mask_value=0.0, input_shape=(X.shape[1], X.shape[2])))
-model.add(TimeDistributedDense(100, init='glorot_uniform', activation=LeakyReLU(alpha=0.1)))
+	#model.add(Masking(mask_value=0.0, input_shape=(X.shape[1], X.shape[2])))
+	model.add(BatchNormalization(mode=0, input_shape=(X.shape[1], X.shape[2])))
+	model.add(TimeDistributedDense(50, init='glorot_uniform', activation='linear')) #, input_shape=(X.shape[1], X.shape[2])))
+	model.add(LeakyReLU(alpha=0.1))
+	model.add(BatchNormalization(mode=0))
+	
+	#model.add(LSTM(output_dim=20, activation=LeakyReLU(alpha=0.1), inner_activation='hard_sigmoid', return_sequences=True))
+	model.add(LSTM(output_dim=50, activation='tanh', inner_activation='sigmoid'))
+	model.add(LeakyReLU(alpha=0.1))
+	
+	model.add(Dense(20))
+	model.add(BatchNormalization(mode=0))
 
-model.add(LSTM(output_dim=100, activation=LeakyReLU(alpha=0.1), inner_activation='hard_sigmoid', return_sequences=True))
-model.add(LSTM(output_dim=100, activation=LeakyReLU(alpha=0.1), inner_activation='hard_sigmoid'))
+	model.add(LeakyReLU(alpha=0.1))
 
-model.add(BatchNormalization(mode=0))
-model.add(Dense(2))
+	model.add(Dense(2))
+	
+	print 'compiling'
+	model.compile(loss='mean_squared_error', optimizer='adam')
 
-print 'compiling'
-model.compile(loss='mean_squared_error', optimizer='adam')
 
-model.fit(X, y, batch_size=8, nb_epoch=200, verbose=1)
+	#model.load_weights('model.h5')
+	model.fit(X, y, batch_size=8, nb_epoch=100, verbose=1)
+
+	# save model
+	open('model.json','w').write(model.to_json())
+	model.save_weights('model.h5')
+
 #score = model.evaluate(X_test, Y_test, batch_size=16)
 
 '''
