@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 	write(fout, num_samples);
 	write(fout, samples_per_window);
 	
-	for (int i = 0; i < num_samples; i += samples_per_window)
+	for (int i = 0; i+samples_per_window-1 < num_samples; i += samples_per_window)
 	{
 		cout << i << endl;
 		
