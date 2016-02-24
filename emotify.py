@@ -23,12 +23,14 @@ for f in glob('*/*.ftw'):
 	total_samples = struct.Struct('i').unpack_from(data, offset=0)[0]
 	window_samples = struct.Struct('i').unpack_from(data, offset=4)[0]
 	
-	print total_samples, window_samples
 	
 	data = data[8:]
 	p = struct.Struct('d')
+	timewindow = total_samples/window_samples
 	
-	X = np.zeros((1, total_samples/window_samples, window_samples)).astype(np.float32)
+	print "total_samples: ", total_samples, "\nwindow_samples: ", window_samples, "\n timewindow", timewindow
+	
+	X = np.zeros((1, timewindow, window_samples)).astype(np.float32)
 	
 	# TODO loop dummy and slow
 	for i in range(0, total_samples, window_samples):
