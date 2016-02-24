@@ -13,7 +13,13 @@ print 'loading data'
 
 for f in glob('*/*.ftw'):
 	data = open(f).read()
-	
+	print "reading file ", f
+	#Parse file name to get SE and NP values
+	values = f.split("/")[1].split("_")
+	SE = values[0]
+	NP = values[1].split(".")[0]
+	print "with SE ", SE, " and NP ", NP
+	#DONE, direct the values to ML
 	total_samples = struct.Struct('i').unpack_from(data, offset=0)[0]
 	window_samples = struct.Struct('i').unpack_from(data, offset=4)[0]
 	
