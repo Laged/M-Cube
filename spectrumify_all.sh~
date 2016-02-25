@@ -1,0 +1,3 @@
+#!/bin/bash
+
+for FOO in *.wav; do ./spectrumify.cpp $FOO; done

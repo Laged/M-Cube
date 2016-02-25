@@ -1,3 +1,3 @@
 #!/bin/bash
 
-for FOO in *.wav; do ./spectrumify $FOO; done
+for FOO in biisut/*.wav; do ./spectrumify $FOO; done
