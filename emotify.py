@@ -12,6 +12,7 @@ from keras.layers.recurrent import LSTM
 from keras.layers.normalization import BatchNormalization
 from keras.layers.advanced_activations import LeakyReLU
 from keras.models import model_from_json
+from keras.optimizers import Adam
 
 print 'loading data'
 
@@ -54,9 +55,15 @@ X = X[:, :220 * 5 * 2, :]
 
 # try load model
 if os.path.isfile('model.json') and os.path.isfile('model.h5') and False:
+	print 'loading model'
 	model = model_from_json(open('model.json').read())
 	model.load_weights('model.h5')
+	print 'compiling'
+	model.compile(loss='mean_squared_error', optimizer='adam')
+
 else:
+	learningRate = 0.1
+	print 'creating model with learningRate ', learningRate
 	model = Sequential()
 
 	#model.add(Masking(mask_value=0.0, input_shape=(X.shape[1], X.shape[2])))
@@ -75,9 +82,10 @@ else:
 	model.add(LeakyReLU(alpha=0.1))
 
 	model.add(Dense(2))
-	
+	adam = Adam(lr=learningRate)#TODO: TRY RMSPROP :_D
+
 	print 'compiling'
-	model.compile(loss='mean_squared_error', optimizer='adam')
+	model.compile(loss='mean_squared_error', optimizer=adam)
 
 
 	#model.load_weights('model.h5')
