@@ -62,7 +62,7 @@ if os.path.isfile('model.json') and os.path.isfile('model.h5') and False:
 	model.compile(loss='mean_squared_error', optimizer='adam')
 
 else:
-	learningRate = 0.1
+	learningRate = 0.01
 	print 'creating model with learningRate ', learningRate
 	model = Sequential()
 
@@ -82,11 +82,9 @@ else:
 	model.add(LeakyReLU(alpha=0.1))
 
 	model.add(Dense(2))
-	adam = Adam(lr=learningRate)#TODO: TRY RMSPROP :_D
-
-	print 'compiling'
-	model.compile(loss='mean_squared_error', optimizer=adam)
-
+	rmsprop = keras.optimizers.RMSprop(lr=learningRate, rho=0.9, epsilon=1e-06)
+	print 'compiling with rmsprop'
+	model.compile(loss='mean_squared_error', optimizer=rmsprop)
 
 	#model.load_weights('model.h5')
 	model.fit(X, y, batch_size=8, nb_epoch=100, verbose=1)
